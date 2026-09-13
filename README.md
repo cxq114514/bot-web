@@ -1,8 +1,26 @@
-# Crawlspace · Next.js 多网站采集工作台
+<h1 align="center">
+  <img src="https://s.luogu.me/f/zYfQ/%E4%B8%8B%E8%BD%BD.svg" alt="Crawlspace 图标" width="48" height="48">
+  Crawlspace
+</h1>
+<p align="center">基于 Next.js 的多网站采集工作台</p>
 
-[![Validate crawler](https://github.com/cxq114514/bot-web/actions/workflows/ci.yml/badge.svg)](https://github.com/cxq114514/bot-web/actions/workflows/ci.yml)
+<p align="center">
+  <a href="https://github.com/cxq114514/bot-web/actions/workflows/ci.yml"><img src="https://github.com/cxq114514/bot-web/actions/workflows/ci.yml/badge.svg" alt="Validate crawler"></a>
+  <a href="https://github.com/cxq114514/bot-web/stargazers"><img src="https://img.shields.io/github/stars/cxq114514/bot-web?style=flat-square" alt="Stars"></a>
+  <a href="https://github.com/cxq114514/bot-web/issues"><img src="https://img.shields.io/github/issues/cxq114514/bot-web?style=flat-square" alt="Issues"></a>
+  <a href="https://github.com/cxq114514/bot-web/network/members"><img src="https://img.shields.io/github/forks/cxq114514/bot-web?style=flat-square" alt="Forks"></a>
+  <a href="https://github.com/cxq114514/bot-web/blob/main/LICENSE"><img src="https://img.shields.io/github/license/cxq114514/bot-web?style=flat-square" alt="License"></a>
+</p>
 
-基于 Next.js App Router、TypeScript 和 Cheerio。支持 HTML 网页、多站点规则和自定义 JSON 接口，前端和流式抓取 API 在同一个项目中运行。
+<p align="center">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js">
+  <img src="https://img.shields.io/badge/Node.js-20.9%2B-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js 20.9+">
+</p>
+
+<p align="center">
+  基于 Next.js App Router、TypeScript 和 Cheerio。支持 HTML 网页、多站点规则和自定义 JSON 接口，前端和流式抓取 API 在同一个项目中运行。
+</p>
 
 ## 功能
 
