@@ -52,5 +52,11 @@ export function extractJson(
   for (const field of config.fields)
     if (rows.length && rows.every((row) => !row[field.name]))
       warnings.push(`「${field.name}」没有提取到内容，请核对 JSON 路径。`);
-  return { rows, warnings, nextUrl: null, title: new URL(sourceUrl).hostname };
+  return {
+    rows,
+    matched: records.length,
+    warnings,
+    nextUrl: null,
+    title: new URL(sourceUrl).hostname,
+  };
 }

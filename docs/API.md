@@ -2,6 +2,17 @@
 
 `POST /api/crawl` 接收 JSON，返回 `application/x-ndjson` 事件流。HTML 为默认模式，接口模式设 `sourceType: "json"`。浏览器和程序调用使用同一套验证与限制。
 
+所有操作都必须先由操作者阅读并同意 [免责声明](../DISCLAIMER.md)，随后携带 `X-Crawlspace-Consent: 2026-09-13-v2`。缺失或版本过期返回 403，不读取配置或发起目标请求。该声明确认不是账户鉴权。
+
+## 试运行、自动分析和动态渲染
+
+- `operation`：`crawl`（默认）、`test`（规则试运行）、`analyze`（响应分析）。`test` 和 `analyze` 在服务器强制只采一页；`analyze` 不要求有效的当前字段规则，但接口请求配置仍会验证。
+- `renderMode`：`static`（默认）或 `browser`，后者仅支持 HTML。
+- `renderWaitMs`：0～10000 的整数，默认 2000。
+- `waitSelector`：可选 CSS 选择器，最长 300 字符；动态模式等待该元素出现（最多 15 秒）后再额外等待。单页整个渲染最多 30 秒，仍计入任务 120 秒总时限。
+
+`analyze` 根据实际内容识别 HTML／JSON并推荐规则；非 HTML／JSON 响应返回错误。分析不自动修改客户端配置。试运行和分析使用同一套并发、体积、限速与出站检查。动态模式的运行依赖与资源限制见 [README](../README.md#动态网页采集)。
+
 ## HTML 请求
 
 ```json
@@ -77,7 +88,8 @@
 ```js
 const response = await fetch("http://127.0.0.1:3000/api/crawl", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
+  // 仅在实际操作者已阅读并同意当前版本声明后传入此确认。
+  headers: { "Content-Type": "application/json", "X-Crawlspace-Consent": "2026-09-13-v2" },
   body: JSON.stringify(config),
 });
 if (!response.ok) throw new Error((await response.json()).error);
@@ -98,6 +110,7 @@ if (pending.trim()) console.log(JSON.parse(pending));
 
 - `log`：`message` 和 `level`（info／success／warning）。警告发现时即时发送，调用方应保留，即使之后任务失败或取消。
 - `page`：页面元信息 `page` 和本页记录 `rows`。
+- `probe`：仅试运行／分析返回。`report` 包含 `operation`、HTTP `status`、`contentType`、实际 `sourceType`、是否 `rendered`、匹配总数 `matched`、保留数 `sampled`、各字段的 `filled` 非空数与选择器，以及 `notes`。分析另附 `suggested`（`sourceType`、`rowSelector`、`fields`、`nextSelector`）。命中率以 `sampled` 为分母，最多计算本页保留的 200 条。
 - `done`：`result` 含 `rows`、`fields`、`pages`、`warnings`、`duration`（毫秒）和 `completedAt`。
 - `error`：流已启动后的错误，`message` 是用户可读原因。不要只凭 HTTP 200 判断任务成功，必须收到 `done`。
 
@@ -110,3 +123,5 @@ if (pending.trim()) console.log(JSON.parse(pending));
 两种模式均检查 robots.txt，检查时不携带自定义头或请求体。同一进程内同源请求共享至少 1 秒的间隔，并遵守不超过 10 秒的 Crawl-delay；不跨进程协调。每进程最多 3 个任务（包含正在读取配置的请求）；配置读取最多 10 秒，超时返回 408。每任务最多 10 页，每页 200 条，每条 12 字段。响应体最多 3 MB，输出每页最多 1 MB、任务最多 5 MB；网络请求 15 秒超时、任务从读取配置开始共 120 秒超时。
 
 当前 API 无账户鉴权，适合个人本地运行。对外服务前需要加入认证、共享限流和出站控制。请阅读 [免责声明](../DISCLAIMER.md)。
+
+历史记录由浏览器在收到任务结果后写入 IndexedDB，API 不保存历史。页面导出的 JSON 会带 `selection`，说明原始条数和筛选条件；`rows` 是当前筛选／排序／去重后的记录，`pages` 仍为原任务页面统计。

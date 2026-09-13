@@ -4,7 +4,12 @@ const config: NextConfig = {
   poweredByHeader: false,
   turbopack: { root: process.cwd() },
   devIndicators: false,
-  serverExternalPackages: ["cheerio", "ipaddr.js", "robots-parser"],
+  serverExternalPackages: [
+    "cheerio",
+    "ipaddr.js",
+    "robots-parser",
+    "playwright",
+  ],
   async headers() {
     return [
       {

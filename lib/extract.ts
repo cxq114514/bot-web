@@ -15,6 +15,17 @@ export function validateConfig(value: unknown): CrawlConfig {
   )
     throw new CrawlError("不支持的数据源类型。");
   const json = config.sourceType === "json";
+  if (![undefined, "static", "browser"].includes(config.renderMode))
+    throw new CrawlError("不支持的网页渲染模式。");
+  if (json && config.renderMode === "browser")
+    throw new CrawlError("浏览器渲染仅适用于 HTML 网页。");
+  const renderWaitMs = config.renderWaitMs ?? 2000;
+  if (
+    !Number.isInteger(renderWaitMs) ||
+    renderWaitMs < 0 ||
+    renderWaitMs > 10000
+  )
+    throw new CrawlError("渲染等待时间应为 0 到 10000 毫秒。");
   const api = json ? validateApi(config.api) : undefined;
   if (typeof config.url !== "string" || config.url.length > 2048)
     throw new CrawlError("网址格式不正确或过长。");
@@ -49,6 +60,8 @@ export function validateConfig(value: unknown): CrawlConfig {
     }
   };
   validateSelector(config.rowSelector, "列表容器", true);
+  if (!json)
+    validateSelector(config.waitSelector ?? "", "渲染等待选择器", true);
   if (!json) validateSelector(config.nextSelector, "下一页选择器", true);
   if (
     !Number.isInteger(config.maxPages) ||
@@ -91,6 +104,9 @@ export function validateConfig(value: unknown): CrawlConfig {
   return {
     url: config.url,
     sourceType: json ? "json" : "html",
+    renderMode: config.renderMode ?? "static",
+    renderWaitMs,
+    waitSelector: json ? "" : (config.waitSelector ?? "").trim(),
     api,
     maxPages: config.maxPages,
     fields,
@@ -193,6 +209,7 @@ export function extractPage(
   }
   return {
     rows,
+    matched: matches.length,
     warnings,
     nextUrl,
     title: $("title").first().text().trim() || new URL(url).hostname,

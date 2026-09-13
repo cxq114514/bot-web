@@ -1,7 +1,12 @@
 import { crawl } from "@/lib/crawler";
 import { validateConfig } from "@/lib/extract";
 import { CrawlError, parseTarget } from "@/lib/safe-fetch";
-import type { CrawlEvent } from "@/lib/types";
+import {
+  initialConfig,
+  type CrawlEvent,
+  type CrawlOperation,
+} from "@/lib/types";
+import { consentHeader, DISCLAIMER_VERSION } from "@/lib/consent";
 import { readConfigBody } from "@/lib/request-body";
 
 export const runtime = "nodejs";
@@ -10,6 +15,11 @@ export const maxDuration = 120;
 let running = 0;
 
 export async function POST(request: Request) {
+  if (request.headers.get(consentHeader) !== DISCLAIMER_VERSION)
+    return Response.json(
+      { error: "请先阅读并同意当前版本的免责声明。" },
+      { status: 403 },
+    );
   const origin = request.headers.get("origin");
   if (origin) {
     try {
@@ -44,8 +54,39 @@ export async function POST(request: Request) {
     AbortSignal.timeout(120_000),
   ]);
   let config;
+  let operation: CrawlOperation = "crawl";
   try {
-    config = validateConfig(await readConfigBody(request));
+    const body = await readConfigBody(request);
+    if (!body || typeof body !== "object")
+      throw new CrawlError("采集配置格式不正确。");
+    const raw = body as Record<string, unknown>;
+    if (
+      raw.operation !== undefined &&
+      !["crawl", "test", "analyze"].includes(String(raw.operation))
+    )
+      throw new CrawlError("不支持的任务类型。");
+    operation = (raw.operation ?? "crawl") as CrawlOperation;
+    config = validateConfig({
+      ...raw,
+      ...(operation !== "crawl" ? { maxPages: 1 } : {}),
+      ...(operation === "analyze"
+        ? {
+            fields:
+              raw.sourceType === "json"
+                ? [
+                    {
+                      id: "value",
+                      name: "值",
+                      selector: "$",
+                      attribute: "text",
+                    },
+                  ]
+                : initialConfig.fields,
+            rowSelector: "",
+            nextSelector: "",
+          }
+        : {}),
+    });
     parseTarget(config.url);
   } catch (error) {
     running--;
@@ -70,7 +111,7 @@ export async function POST(request: Request) {
           aborter.abort();
         }
       };
-      crawl(config, signal, emit)
+      crawl(config, signal, emit, undefined, undefined, { operation })
         .then((result) => emit({ type: "done", result }))
         .catch((error) => {
           emit({

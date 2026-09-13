@@ -20,10 +20,16 @@ export function removeProfile(
   // Migrate older storage that has a config snapshot but no profile identity.
   if (!lastId && deleted) {
     try {
-      const snapshot = JSON.parse(storage.getItem("crawlspace-rule-v1") ?? "null");
-      removeLast = isConfig(snapshot) &&
-        JSON.stringify(persistentConfig(snapshot)) === JSON.stringify(deleted.config);
-    } catch { /* Leave an unrelated snapshot alone. */ }
+      const snapshot = JSON.parse(
+        storage.getItem("crawlspace-rule-v1") ?? "null",
+      );
+      removeLast =
+        isConfig(snapshot) &&
+        JSON.stringify(persistentConfig(snapshot)) ===
+          JSON.stringify(deleted.config);
+    } catch {
+      /* Leave an unrelated snapshot alone. */
+    }
   }
   const next = profiles.filter((profile) => profile.id !== id);
   storage.setItem(profileStorageKey, JSON.stringify(next));
@@ -37,6 +43,16 @@ export function removeProfile(
 export function isConfig(value: unknown): value is CrawlConfig {
   if (!value || typeof value !== "object") return false;
   const c = value as CrawlConfig;
+  if (
+    ![undefined, "static", "browser"].includes(c.renderMode) ||
+    (c.renderWaitMs !== undefined &&
+      (!Number.isInteger(c.renderWaitMs) ||
+        c.renderWaitMs < 0 ||
+        c.renderWaitMs > 10000)) ||
+    (c.waitSelector !== undefined &&
+      (typeof c.waitSelector !== "string" || c.waitSelector.length > 300))
+  )
+    return false;
   if (
     typeof c.url !== "string" ||
     c.url.length > 2048 ||
