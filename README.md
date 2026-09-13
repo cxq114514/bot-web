@@ -1,5 +1,7 @@
 # Crawlspace · Next.js 多网站采集工作台
 
+[![Validate crawler](https://github.com/cxq114514/bot-web/actions/workflows/ci.yml/badge.svg)](https://github.com/cxq114514/bot-web/actions/workflows/ci.yml)
+
 基于 Next.js App Router、TypeScript 和 Cheerio。支持 HTML 网页、多站点规则和自定义 JSON 接口，前端和流式抓取 API 在同一个项目中运行。
 
 ## 功能
