@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+.sites-runtime/
+.env*
+!.env.example
+*.tsbuildinfo
+test-results/
+playwright-report/
+*.log
