@@ -2,6 +2,7 @@ import { lookup } from "node:dns/promises";
 import http from "node:http";
 import https from "node:https";
 import ipaddr from "ipaddr.js";
+import { CRAWLSPACE_USER_AGENT } from "./version";
 
 export class CrawlError extends Error {
   constructor(
@@ -105,7 +106,7 @@ async function requestOnce(
           Accept: "text/html,application/xhtml+xml,text/plain;q=0.9",
           ...options.headers,
           Host: url.host,
-          "User-Agent": "Crawlspace/1.0",
+          "User-Agent": CRAWLSPACE_USER_AGENT,
           "Accept-Encoding": "identity",
           ...(options.body
             ? { "Content-Length": Buffer.byteLength(options.body) }

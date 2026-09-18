@@ -7,6 +7,7 @@ import {
   type ResponseData,
 } from "./safe-fetch";
 import type { CrawlConfig } from "./types";
+import { CRAWLSPACE_USER_AGENT } from "./version";
 
 export function allowedBrowserRequest(
   url: string,
@@ -76,7 +77,7 @@ export async function renderPage(
     const context = await browser.newContext({
       serviceWorkers: "block",
       acceptDownloads: false,
-      userAgent: "Crawlspace/1.0",
+      userAgent: CRAWLSPACE_USER_AGENT,
       viewport: { width: 1280, height: 900 },
     });
     await context.routeWebSocket("**/*", (socket) => socket.close());
