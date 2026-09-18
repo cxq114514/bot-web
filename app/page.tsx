@@ -79,6 +79,7 @@ import {
 } from "@/components/source-settings";
 import { defaultApi } from "@/lib/presets";
 import { isConfig, persistentConfig } from "@/lib/profiles";
+import { APP_VERSION } from "@/lib/version";
 
 type Log = {
   time: string;
@@ -899,7 +900,7 @@ export default function Home() {
             </div>
             <div className="sidebar-footer">
               <span className="local-indicator" />
-              本地工作空间<span>v1.0</span>
+              本地工作空间<span>v{APP_VERSION}</span>
             </div>
           </div>
         </aside>
