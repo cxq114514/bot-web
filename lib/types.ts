@@ -5,6 +5,9 @@ export type Field = {
   attribute: string;
 };
 export type CrawlConfig = {
+  renderMode?: "static" | "browser";
+  renderWaitMs?: number;
+  waitSelector?: string;
   sourceType?: "html" | "json";
   api?: ApiOptions;
   url: string;
@@ -36,10 +39,33 @@ export type CrawlResult = {
   completedAt: string;
 };
 export type CrawlEvent =
+  | { type: "probe"; report: ProbeReport }
   | { type: "log"; message: string; level: "info" | "success" | "warning" }
   | { type: "page"; page: CrawlPage; rows: CrawlRow[] }
   | { type: "done"; result: CrawlResult }
   | { type: "error"; message: string };
+
+export type CrawlOperation = "crawl" | "test" | "analyze";
+export type ProbeReport = {
+  operation: "test" | "analyze";
+  status: number;
+  contentType: string;
+  sourceType: "html" | "json";
+  rendered: boolean;
+  matched: number;
+  sampled: number;
+  fields: {
+    name: string;
+    selector: string;
+    attribute: string;
+    filled: number;
+  }[];
+  suggested?: Pick<
+    CrawlConfig,
+    "sourceType" | "rowSelector" | "fields" | "nextSelector"
+  >;
+  notes: string[];
+};
 
 export const initialConfig: CrawlConfig = {
   url: "",

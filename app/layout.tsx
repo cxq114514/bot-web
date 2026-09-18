@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./workbench.css";
 
 export const metadata: Metadata = {
   title: "Crawlspace · 网页采集工作台",

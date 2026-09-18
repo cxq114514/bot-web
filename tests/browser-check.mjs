@@ -21,6 +21,8 @@ await page.goto(process.env.CRAWLSPACE_QA_URL || "http://127.0.0.1:3000", {
   timeout: 60000,
 });
 await page.getByRole("heading", { name: /^采集工作台/ }).waitFor();
+await page.getByLabel("我已阅读并同意免责声明").check();
+await page.getByRole("button", { name: "同意并进入工作台" }).click();
 await page.getByRole("button", { name: "使用帮助" }).click();
 await page.getByRole("dialog").waitFor();
 await page.keyboard.press("Escape");
